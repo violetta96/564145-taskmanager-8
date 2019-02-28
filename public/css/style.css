@@ -376,6 +376,7 @@ body {
   flex-wrap: wrap;
   max-height: 30px;
   overflow: auto;
+  width: 120px;
 }
 .card__hashtag-name {
   margin-right: 3px;
