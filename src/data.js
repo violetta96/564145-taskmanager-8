@@ -20,6 +20,12 @@ const colors = [
   `pink`
 ];
 
+const DAY = 24 * 60 * 60 * 1000;
+
+const DAYS_MAX = 14;
+
+const DAYS_MIN = 7;
+
 const getRandomNumber = (min, max) => Math.floor(Math.random() * (max - min)) + min;
 
 const getRandomItem = (items) => items[getRandomNumber(0, items.length)];
@@ -36,19 +42,19 @@ const getRandomTags = (items) => {
 
 export default () => ({
   title: getRandomItem(titles),
-  dueDate: Date.now() - (7 * 24 * 60 * 60 * 1000) + Math.floor(Math.random() * 14) * 24 * 60 * 60 * 1000,
+  dueDate: Date.now() - (DAYS_MIN * DAY) + Math.floor(Math.random() * DAYS_MAX) * DAY,
   tags: getRandomTags(tags),
   picture: `http://picsum.photos/100/100?r=${Math.random()}`,
   color: getRandomItem(colors),
   repeatingDays: {
-    'mo': getRandomInt(0, 1),
-    'tu': getRandomInt(0, 1),
-    'we': getRandomInt(0, 1),
-    'th': getRandomInt(0, 1),
-    'fr': getRandomInt(0, 1),
-    'sa': getRandomInt(0, 1),
-    'su': getRandomInt(0, 1),
+    'mo': !!getRandomInt(0, 1),
+    'tu': !!getRandomInt(0, 1),
+    'we': !!getRandomInt(0, 1),
+    'th': !!getRandomInt(0, 1),
+    'fr': !!getRandomInt(0, 1),
+    'sa': !!getRandomInt(0, 1),
+    'su': !!getRandomInt(0, 1),
   },
-  isFavorite: getRandomInt(0, 1),
-  isDone: getRandomInt(0, 1)
+  isFavorite: !!getRandomInt(0, 1),
+  isDone: !!getRandomInt(0, 1)
 });
