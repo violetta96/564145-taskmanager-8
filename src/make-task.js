@@ -1,6 +1,51 @@
+// функция для проверки на повторение задачи по дням
+const isRepeating = (days) => {
+  for (const day in days) {
+    if (days[day]) {
+      return true;
+    }
+  }
+  return false;
+};
+
+// форматирование даты
+const dateFormatter = new Intl.DateTimeFormat(`en-US`, {
+  day: `numeric`,
+  month: `long`,
+  year: `numeric`
+});
+
+// форматирование времени
+const timeFormatter = new Intl.DateTimeFormat(`ru`, {
+  hour: `numeric`,
+  minute: `numeric`
+});
+
+// функция для генерирования разметки тегов
+const getHashtagsHTML = (hachtags) => {
+  let fragment = ``;
+  hachtags.forEach((hachtag)=> {
+    fragment += `<span class="card__hashtag-inner">
+    <input
+      type="hidden"
+      name="hashtag"
+      value="repeat"
+      class="card__hashtag-hidden-input"
+    />
+    <button type="button" class="card__hashtag-name">
+      #${hachtag}
+    </button>
+    <button type="button" class="card__hashtag-delete">
+      delete
+    </button>
+  </span>`;
+  });
+  return fragment;
+};
+
 // функция для создания карточки
-export default () => {
-  return `<article class="card card--pink card--repeat">
+export default (task) => {
+  return `<article class="card card--${task.color} ${isRepeating(task.repeatingDays) ? `card--repeat` : ``}">
     <form class="card__form" method="get">
       <div class="card__inner">
         <div class="card__control">
@@ -12,7 +57,7 @@ export default () => {
           </button>
           <button
             type="button"
-            class="card__btn card__btn--favorites card__btn--disabled">
+            class="card__btn card__btn--favorites ${task.isFavorite ? `card__btn--disabled` : ``}">
             favorites
           </button>
         </div>
@@ -26,7 +71,7 @@ export default () => {
             <textarea
               class="card__text"
               placeholder="Start typing your text here..."
-              name="text">It is example of repeating task. It marks by wave.
+              name="text">${task.title}
             </textarea>
           </label>
         </div>
@@ -36,28 +81,31 @@ export default () => {
               <button class="card__date-deadline-toggle" type="button">
                 date: <span class="card__date-status">no</span>
               </button>
-              <fieldset class="card__date-deadline" disabled>
+              <fieldset class="card__date-deadline" ${(task.dueDate < Date.now()) ? `disabled` : ``}>
                 <label class="card__input-deadline-wrap">
                   <input
                     class="card__date"
                     type="text"
-                    placeholder="23 September"
+                    placeholder="${dateFormatter.format(task.dueDate)}"
                     name="date"
+                    value = "${dateFormatter.format(task.dueDate)}"
+
                   />
                 </label>
                 <label class="card__input-deadline-wrap">
                   <input
                     class="card__time"
                     type="text"
-                    placeholder="11:15 PM"
+                    placeholder="${timeFormatter.format(task.dueDate)}"
                     name="time"
+                    value = "${timeFormatter.format(task.dueDate)}"
                   />
                 </label>
               </fieldset>
               <button class="card__repeat-toggle" type="button">
                 repeat:<span class="card__repeat-status">no</span>
               </button>
-              <fieldset class="card__repeat-days" disabled>
+              <fieldset class="card__repeat-days ${isRepeating(task.repeatingDays) ? `` : ` disabled`}">
                 <div class="card__repeat-days-inner">
                   <input
                     class="visually-hidden card__repeat-day-input"
@@ -65,6 +113,7 @@ export default () => {
                     id="repeat-mo-2"
                     name="repeat"
                     value="mo"
+                    ${task.repeatingDays.mo ? `checked` : ``}
                   />
                   <label class="card__repeat-day" for="repeat-mo-2">
                   mo
@@ -75,7 +124,7 @@ export default () => {
                     id="repeat-tu-2"
                     name="repeat"
                     value="tu"
-                    checked
+                    ${task.repeatingDays.tu ? `checked` : ``}
                   />
                   <label class="card__repeat-day" for="repeat-tu-2">
                   tu
@@ -86,6 +135,7 @@ export default () => {
                     id="repeat-we-2"
                     name="repeat"
                     value="we"
+                    ${task.repeatingDays.we ? `checked` : ``}
                   />
                   <label class="card__repeat-day" for="repeat-we-2">
                   we
@@ -96,6 +146,7 @@ export default () => {
                     id="repeat-th-2"
                     name="repeat"
                     value="th"
+                    ${task.repeatingDays.th ? `checked` : ``}
                   />
                   <label class="card__repeat-day" for="repeat-th-2">
                      th
@@ -106,7 +157,7 @@ export default () => {
                     id="repeat-fr-2"
                     name="repeat"
                     value="fr"
-                    checked
+                    ${task.repeatingDays.fr ? `checked` : ``}
                   />
                   <label class="card__repeat-day" for="repeat-fr-2">
                     fr
@@ -117,6 +168,7 @@ export default () => {
                     name="repeat"
                     value="sa"
                     id="repeat-sa-2"
+                    ${task.repeatingDays.sa ? `checked` : ``}
                   />
                   <label class="card__repeat-day" for="repeat-sa-2">
                     sa
@@ -127,7 +179,7 @@ export default () => {
                     id="repeat-su-2"
                     name="repeat"
                     value="su"
-                    checked
+                    ${task.repeatingDays.su ? `checked` : ``}
                   />
                   <label class="card__repeat-day" for="repeat-su-2">
                     su
@@ -137,48 +189,7 @@ export default () => {
             </div>
             <div class="card__hashtag">
               <div class="card__hashtag-list">
-                <span class="card__hashtag-inner">
-                  <input
-                    type="hidden"
-                    name="hashtag"
-                    value="repeat"
-                    class="card__hashtag-hidden-input"
-                  />
-                  <button type="button" class="card__hashtag-name">
-                    #repeat
-                  </button>
-                  <button type="button" class="card__hashtag-delete">
-                    delete
-                  </button>
-                </span>
-                <span class="card__hashtag-inner">
-                  <input
-                    type="hidden"
-                    name="hashtag"
-                    value="repeat"
-                    class="card__hashtag-hidden-input"
-                  />
-                  <button type="button" class="card__hashtag-name">
-                    #cinema
-                  </button>
-                  <button type="button" class="card__hashtag-delete">
-                    delete
-                  </button>
-                </span>
-                <span class="card__hashtag-inner">
-                  <input
-                    type="hidden"
-                    name="hashtag"
-                    value="repeat"
-                    class="card__hashtag-hidden-input"
-                  />
-                  <button type="button" class="card__hashtag-name">
-                    #entertaiment
-                  </button>
-                  <button type="button" class="card__hashtag-delete">
-                    delete
-                  </button>
-                </span>
+                ${getHashtagsHTML(task.tags)}
               </div>
               <label>
                 <input
@@ -190,14 +201,14 @@ export default () => {
               </label>
             </div>
           </div>
-          <label class="card__img-wrap card__img-wrap--empty">
+          <label class="card__img-wrap${task.picture ? `` : `card__img-wrap--empty`}">
             <input
               type="file"
               class="card__img-input visually-hidden"
               name="img"
             />
             <img
-              src="img/add-photo.svg"
+              src="${task.picture}"
               alt="task picture"
               class="card__img"
             />
