@@ -57,7 +57,7 @@ export default class TaskEdit {
 
 
   get template() {
-    return `<article class="card card--${this._color} ${this._isRepeating(this._repeatingDays) ? `card--repeat` : ``}">
+    return `<article class="card card--edit card--${this._color} ${this._isRepeating(this._repeatingDays) ? `card--repeat` : ``}">
       <form class="card__form" method="get">
         <div class="card__inner">
           <div class="card__control">
