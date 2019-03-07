@@ -1,6 +1,8 @@
 import task from './data.js';
-import generateCard from './make-task.js';
+// import generateCard from './make-task.js';
 import {filtersNames, generateFilter} from './make-filter.js';
+import Task from './task.js';
+import TaskEdit from './task-edit.js';
 
 const CARDS_AMOUNT = 7;
 
@@ -16,14 +18,27 @@ const renderFilters = () => {
 
 // функция для отрисовки карточек
 const renderTasks = (num) => {
-  let fragment = ``;
   const boardTasks = document.querySelector(`.board__tasks`);
+  boardTasks.innerHTML = ``;
   for (let i = 0; i < num; i++) {
-    fragment += generateCard(task());
-  }
-  boardTasks.innerHTML = fragment;
-};
+    const taskComponent = new Task(task());
+    const editTaskComponent = new TaskEdit(task());
 
+    boardTasks.appendChild(taskComponent.render());
+
+    taskComponent.onEdit = () => {
+      editTaskComponent.render();
+      boardTasks.replaceChild(editTaskComponent.element, taskComponent.element);
+      taskComponent.unrender();
+    };
+
+    editTaskComponent.onSubmit = () => {
+      taskComponent.render();
+      boardTasks.replaceChild(taskComponent.element, editTaskComponent.element);
+      editTaskComponent.unrender();
+    };
+  }
+};
 
 // функция для добовления оброботчика событий на фильтр
 const onFilterClick = (evt) => {
@@ -33,6 +48,7 @@ const onFilterClick = (evt) => {
     renderTasks(cardsNumber);
   }
 };
+
 
 renderFilters();
 renderTasks(CARDS_AMOUNT);
