@@ -12,6 +12,7 @@ export default class Task {
 
     this._element = null;
     this._onEdit = null;
+    this._onEditButtonClick = this._onEditButtonClick.bind(this);
   }
 
   _isRepeating(days) {
@@ -204,8 +205,7 @@ export default class Task {
                     <input type="hidden" name="hashtag" value="${tag}" class="card__hashtag-hidden-input" />
                     <button type="button" class="card__hashtag-name">#${tag}</button>
                     <button type="button" class="card__hashtag-delete">delete</button>
-                  </span>`.trim()
-  ))).join(``)}
+                  </span>`.trim()))).join(``)}
                 </div>
                 <label>
                   <input
@@ -305,25 +305,27 @@ export default class Task {
     </article>`.trim();
   }
 
-  bind() {
-    this._element.querySelector(`.card__btn--edit`)
-          .addEventListener(`click`, this._onEditButtonClick.bind(this));
-  }
-
   render() {
-    this._element = createElement(this.template);
-    this.bind();
+    if (!this._element) {
+      this._element = createElement(this.template);
+      this.bind();
+    }
     return this._element;
-  }
-
-  unbind() {
-    this._element.querySelector(`.card__btn--edit`)
-          .removeEventListener(`click`, this._onEditButtonClick.bind(this));
   }
 
   unrender() {
     this.unbind();
     this._element = null;
+  }
+
+  bind() {
+    this._element.querySelector(`.card__btn--edit`)
+          .addEventListener(`click`, this._onEditButtonClick);
+  }
+
+  unbind() {
+    this._element.querySelector(`.card__btn--edit`)
+          .removeEventListener(`click`, this._onEditButtonClick);
   }
 
 }

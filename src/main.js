@@ -5,11 +5,12 @@ import Task from './task.js';
 import TaskEdit from './task-edit.js';
 
 const CARDS_AMOUNT = 7;
+const boardTasks = document.querySelector(`.board__tasks`);
+const mainFilter = document.querySelector(`.main__filter`);
 
 // функция для отрисовки фильтров
 const renderFilters = () => {
   let fragment = ``;
-  const mainFilter = document.querySelector(`.main__filter`);
   for (let i = 0; i < filtersNames.length; i++) {
     fragment += generateFilter(i);
   }
@@ -18,13 +19,10 @@ const renderFilters = () => {
 
 // функция для отрисовки карточек
 const renderTasks = (num) => {
-  const boardTasks = document.querySelector(`.board__tasks`);
-  boardTasks.innerHTML = ``;
+  const fragment = document.createDocumentFragment();
   for (let i = 0; i < num; i++) {
     const taskComponent = new Task(task());
     const editTaskComponent = new TaskEdit(task());
-
-    boardTasks.appendChild(taskComponent.render());
 
     taskComponent.onEdit = () => {
       editTaskComponent.render();
@@ -37,13 +35,18 @@ const renderTasks = (num) => {
       boardTasks.replaceChild(taskComponent.element, editTaskComponent.element);
       editTaskComponent.unrender();
     };
+
+    fragment.appendChild(taskComponent.render());
   }
+
+  boardTasks.appendChild(fragment);
 };
 
 // функция для добовления оброботчика событий на фильтр
 const onFilterClick = (evt) => {
   const filterLabel = evt.target.closest(`.filter__label`);
   if (filterLabel) {
+    boardTasks.innerHTML = ``;
     const cardsNumber = filterLabel.querySelector(`.filter__all-count`).textContent;
     renderTasks(cardsNumber);
   }

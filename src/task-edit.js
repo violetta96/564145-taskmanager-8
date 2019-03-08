@@ -12,6 +12,7 @@ export default class TaskEdit {
 
     this._element = null;
     this._onSubmit = null;
+    this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
   }
 
   _isRepeating(days) {
@@ -206,8 +207,7 @@ export default class TaskEdit {
                     <input type="hidden" name="hashtag" value="${tag}" class="card__hashtag-hidden-input" />
                     <button type="button" class="card__hashtag-name">#${tag}</button>
                     <button type="button" class="card__hashtag-delete">delete</button>
-                  </span>`.trim()
-  ))).join(``)}
+                  </span>`.trim()))).join(``)}
                 </div>
                 <label>
                   <input
@@ -308,8 +308,10 @@ export default class TaskEdit {
   }
 
   render() {
-    this._element = createElement(this.template);
-    this.bind();
+    if (!this._element) {
+      this._element = createElement(this.template);
+      this.bind();
+    }
     return this._element;
   }
 
@@ -319,13 +321,13 @@ export default class TaskEdit {
   }
 
   bind() {
-    this._element.querySelector(`.card__form`)
-        .addEventListener(`submit`, this._onSubmitButtonClick.bind(this));
+    this._element.querySelector(`.card__btn--edit`)
+          .addEventListener(`click`, this._onSubmitButtonClick);
   }
 
   unbind() {
-    this._element.querySelector(`.card__form`)
-        .removeEventListener(`submit`, this._onSubmitButtonClick.bind(this));
+    this._element.querySelector(`.card__btn--edit`)
+          .removeEventListener(`click`, this._onSubmitButtonClick);
   }
 
 }
