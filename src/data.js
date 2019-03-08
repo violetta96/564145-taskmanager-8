@@ -56,5 +56,4 @@ export default () => ({
     'su': !!getRandomInt(0, 1),
   },
   isFavorite: !!getRandomInt(0, 1),
-  isDone: !!getRandomInt(0, 1)
 });
