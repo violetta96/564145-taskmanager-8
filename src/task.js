@@ -1,7 +1,8 @@
-import {createElement} from './create-element.js';
+import Component from './component.js';
 
-export default class Task {
+export default class Task extends Component {
   constructor(data) {
+    super();
     this._title = data.title;
     this._dueDate = data.dueDate;
     this._tags = data.tags;
@@ -10,7 +11,6 @@ export default class Task {
     this._repeatingDays = data.repeatingDays;
     this._isFavorite = data.isFavorite;
 
-    this._element = null;
     this._onEdit = null;
     this._onEditButtonClick = this._onEditButtonClick.bind(this);
   }
@@ -45,10 +45,6 @@ export default class Task {
 
   _onEditButtonClick() {
     return typeof this._onEdit === `function` && this._onEdit();
-  }
-
-  get element() {
-    return this._element;
   }
 
   set onEdit(fn) {
@@ -303,19 +299,6 @@ export default class Task {
         </div>
       </form>
     </article>`.trim();
-  }
-
-  render() {
-    if (!this._element) {
-      this._element = createElement(this.template);
-      this.bind();
-    }
-    return this._element;
-  }
-
-  unrender() {
-    this.unbind();
-    this._element = null;
   }
 
   bind() {
