@@ -1,4 +1,6 @@
 import Component from './component.js';
+import {Color} from './data.js';
+import moment from 'moment';
 
 export default class Task extends Component {
   constructor(data) {
@@ -24,25 +26,6 @@ export default class Task extends Component {
     return false;
   }
 
-  get _dateFormatter() {
-    const dateOptions = {
-      day: `numeric`,
-      month: `long`,
-      year: `numeric`
-    };
-
-    return new Intl.DateTimeFormat(`en-US`, dateOptions);
-  }
-
-  get _timeFormatter() {
-    const timeOptions = {
-      hour: `numeric`,
-      minute: `numeric`,
-    };
-
-    return new Intl.DateTimeFormat(`ru`, timeOptions);
-  }
-
   _onEditButtonClick() {
     return typeof this._onEdit === `function` && this._onEdit();
   }
@@ -52,7 +35,8 @@ export default class Task extends Component {
   }
 
   get template() {
-    return `<article class="card card--${this._color} ${this._isRepeating(this._repeatingDays) ? `card--repeat` : ``}">
+    return `
+    <article class="card ${Color[this._color]} ${this._isRepeating(this._repeatingDays) ? `card--repeat` : ``}">
       <form class="card__form" method="get">
         <div class="card__inner">
           <div class="card__control">
@@ -93,9 +77,9 @@ export default class Task extends Component {
                     <input
                       class="card__date"
                       type="text"
-                      placeholder="${this._dateFormatter.format(this._dueDate)}"
+                      placeholder="${moment(this._dueDate).format(`DD MMMM YYYY`)}"
                       name="date"
-                      value = "${this._dateFormatter.format(this._dueDate)}"
+                      value = "${moment(this._dueDate).format(`DD MMMM YYYY`)}"
 
                     />
                   </label>
@@ -103,96 +87,15 @@ export default class Task extends Component {
                     <input
                       class="card__time"
                       type="text"
-                      placeholder="${this._timeFormatter.format(this._dueDate)}"
+                      placeholder="${moment(this._dueDate).format(`HH:MM`)}"
                       name="time"
-                      value = "${this._timeFormatter.format(this._dueDate)}"
+                      value = "${moment(this._dueDate).format(`HH:MM`)}"
                     />
                   </label>
                 </fieldset>
                 <button class="card__repeat-toggle" type="button">
                   repeat:<span class="card__repeat-status">no</span>
                 </button>
-                <fieldset class="card__repeat-days ${this._isRepeating(this._repeatingDays) ? `` : ` disabled`}">
-                  <div class="card__repeat-days-inner">
-                    <input
-                      class="visually-hidden card__repeat-day-input"
-                      type="checkbox"
-                      id="repeat-mo-2"
-                      name="repeat"
-                      value="mo"
-                      ${this._repeatingDays.mo ? `checked` : ``}
-                    />
-                    <label class="card__repeat-day" for="repeat-mo-2">
-                    mo
-                    </label>
-                    <input
-                      class="visually-hidden card__repeat-day-input"
-                      type="checkbox"
-                      id="repeat-tu-2"
-                      name="repeat"
-                      value="tu"
-                      ${this._repeatingDays.tu ? `checked` : ``}
-                    />
-                    <label class="card__repeat-day" for="repeat-tu-2">
-                    tu
-                    </label>
-                    <input
-                      class="visually-hidden card__repeat-day-input"
-                      type="checkbox"
-                      id="repeat-we-2"
-                      name="repeat"
-                      value="we"
-                      ${this._repeatingDays.we ? `checked` : ``}
-                    />
-                    <label class="card__repeat-day" for="repeat-we-2">
-                    we
-                    </label>
-                    <input
-                      class="visually-hidden card__repeat-day-input"
-                      type="checkbox"
-                      id="repeat-th-2"
-                      name="repeat"
-                      value="th"
-                      ${this._repeatingDays.th ? `checked` : ``}
-                    />
-                    <label class="card__repeat-day" for="repeat-th-2">
-                       th
-                    </label>
-                    <input
-                      class="visually-hidden card__repeat-day-input"
-                      type="checkbox"
-                      id="repeat-fr-2"
-                      name="repeat"
-                      value="fr"
-                      ${this._repeatingDays.fr ? `checked` : ``}
-                    />
-                    <label class="card__repeat-day" for="repeat-fr-2">
-                      fr
-                    </label>
-                    <input
-                      class="visually-hidden card__repeat-day-input"
-                      type="checkbox"
-                      name="repeat"
-                      value="sa"
-                      id="repeat-sa-2"
-                      ${this._repeatingDays.sa ? `checked` : ``}
-                    />
-                    <label class="card__repeat-day" for="repeat-sa-2">
-                      sa
-                    </label>
-                    <input
-                      class="visually-hidden card__repeat-day-input"
-                      type="checkbox"
-                      id="repeat-su-2"
-                      name="repeat"
-                      value="su"
-                      ${this._repeatingDays.su ? `checked` : ``}
-                    />
-                    <label class="card__repeat-day" for="repeat-su-2">
-                      su
-                    </label>
-                  </div>
-                </fieldset>
               </div>
               <div class="card__hashtag">
                 <div class="card__hashtag-list">
@@ -225,72 +128,6 @@ export default class Task extends Component {
                 class="card__img"
               />
             </label>
-            <div class="card__colors-inner">
-              <h3 class="card__colors-title">Color</h3>
-              <div class="card__colors-wrap">
-                <input
-                  type="radio"
-                  id="color-black-2"
-                  class="card__color-input card__color-input--black visually-hidden"
-                  name="color"
-                  value="black"
-                />
-                <label
-                  for="color-black-2"
-                  class="card__color card__color--black">
-                    black
-                </label>
-                <input
-                  type="radio"
-                  id="color-yellow-2"
-                  class="card__color-input card__color-input--yellow visually-hidden"
-                  name="color"
-                  value="yellow"
-                />
-                <label
-                  for="color-yellow-2"
-                  class="card__color card__color--yellow">
-                    yellow
-                </label>
-                <input
-                  type="radio"
-                  id="color-blue-2"
-                  class="card__color-input card__color-input--blue visually-hidden"
-                  name="color"
-                  value="blue"
-                />
-                <label
-                  for="color-blue-2"
-                  class="card__color card__color--blue">
-                    blue
-                </label>
-                <input
-                  type="radio"
-                  id="color-green-2"
-                  class="card__color-input card__color-input--green visually-hidden"
-                  name="color"
-                  value="green"
-                />
-                <label
-                  for="color-green-2"
-                  class="card__color card__color--green"
-                  >green</label
-                >
-                <input
-                  type="radio"
-                  id="color-pink-2"
-                  class="card__color-input card__color-input--pink visually-hidden"
-                  name="color"
-                  value="pink"
-                  checked
-                />
-                <label
-                  for="color-pink-2"
-                  class="card__color card__color--pink">
-                    pink
-                </label>
-              </div>
-            </div>
           </div>
           <div class="card__status-btns">
             <button class="card__save" type="submit">save</button>
@@ -303,12 +140,19 @@ export default class Task extends Component {
 
   bind() {
     this._element.querySelector(`.card__btn--edit`)
-          .addEventListener(`click`, this._onEditButtonClick);
+      .addEventListener(`click`, this._onEditButtonClick);
   }
 
   unbind() {
     this._element.querySelector(`.card__btn--edit`)
-          .removeEventListener(`click`, this._onEditButtonClick);
+      .removeEventListener(`click`, this._onEditButtonClick);
+  }
+
+  update(data) {
+    this._title = data.title;
+    this._tags = data.tags;
+    this._color = data.color;
+    this._repeatingDays = data.repeatingDays;
   }
 
 }
