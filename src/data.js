@@ -1,3 +1,4 @@
+import moment from 'moment';
 const titles = [
   `Изучить теорию`,
   `Сделать домашку`,
@@ -43,6 +44,7 @@ const getRandomTags = (items) => {
 export default () => ({
   title: getRandomItem(titles),
   dueDate: Date.now() - (DAYS_MIN * DAY) + Math.floor(Math.random() * DAYS_MAX) * DAY,
+  dueTime: moment().format(`LT`),
   tags: getRandomTags(tags),
   picture: `http://picsum.photos/100/100?r=${Math.random()}`,
   color: getRandomItem(colors),

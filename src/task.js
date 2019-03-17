@@ -7,6 +7,7 @@ export default class Task extends Component {
     super();
     this._title = data.title;
     this._dueDate = data.dueDate;
+    this._dueTime = data.dueTime;
     this._tags = data.tags;
     this._picture = data.picture;
     this._color = data.color;
@@ -77,9 +78,9 @@ export default class Task extends Component {
                     <input
                       class="card__date"
                       type="text"
-                      placeholder="${moment(this._dueDate).format(`DD MMMM YYYY`)}"
+                      placeholder="${moment(this._dueDate).format(`D MMMM`)}"
                       name="date"
-                      value = "${moment(this._dueDate).format(`DD MMMM YYYY`)}"
+                      value = "${moment(this._dueDate).format(`D MMMM`)}"
 
                     />
                   </label>
@@ -87,9 +88,9 @@ export default class Task extends Component {
                     <input
                       class="card__time"
                       type="text"
-                      placeholder="${moment(this._dueDate).format(`HH:MM`)}"
+                      placeholder="${this._dueTime}"
                       name="time"
-                      value = "${moment(this._dueDate).format(`HH:MM`)}"
+                      value = "${this._dueTime}"
                     />
                   </label>
                 </fieldset>
@@ -153,6 +154,8 @@ export default class Task extends Component {
     this._tags = data.tags;
     this._color = data.color;
     this._repeatingDays = data.repeatingDays;
+    this._dueDate = data.dueDate;
+    this._dueTime = data.dueTime;
   }
 
 }

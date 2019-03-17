@@ -30,12 +30,13 @@ const renderTasks = (num) => {
       taskComponent.unrender();
     };
 
-    editTaskComponent.onSubmit = (newObject) => {
-      taskData.title = newObject.title;
-      taskData.tags = newObject.tags;
-      taskData.color = newObject.color;
-      taskData.repeatingDays = newObject.repeatingDays;
-      taskData.dueDate = newObject.dueDate;
+    editTaskComponent.onSubmit = (updatedTaskData) => {
+      taskData.title = updatedTaskData.title;
+      taskData.tags = updatedTaskData.tags;
+      taskData.color = updatedTaskData.color;
+      taskData.repeatingDays = updatedTaskData.repeatingDays;
+      taskData.dueDate = updatedTaskData.dueDate;
+      taskData.dueTime = updatedTaskData.dueTime;
 
       taskComponent.update(taskData);
       taskComponent.render();

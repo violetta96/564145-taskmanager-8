@@ -8,6 +8,7 @@ export default class TaskEdit extends Component {
     super();
     this._title = data.title;
     this._dueDate = data.dueDate;
+    this._dueTime = data.dueTime;
     this._tags = data.tags;
     this._picture = data.picture;
     this._color = data.color;
@@ -18,7 +19,7 @@ export default class TaskEdit extends Component {
     this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
 
     this._state.isDate = false;
-    this._state.isRepeated = false;
+    this._state.isRepeated = this._isRepeating(this._repeatingDays);
 
     this._onChangeDate = this._onChangeDate.bind(this);
     this._onChangeRepeated = this._onChangeRepeated.bind(this);
@@ -29,7 +30,8 @@ export default class TaskEdit extends Component {
       title: ``,
       color: ``,
       tags: new Set(),
-      dueDate: new Date(),
+      dueDate: ``,
+      dueTime: ``,
       repeatingDays: {
         'mo': false,
         'tu': false,
@@ -66,12 +68,13 @@ export default class TaskEdit extends Component {
     evt.preventDefault();
 
     const formData = new FormData(this._element.querySelector(`.card__form`));
-    const newData = this._processForm(formData);
+    const updatedFormData = this._processForm(formData);
+
     if (typeof this._onSubmit === `function`) {
-      this._onSubmit(newData);
+      this._onSubmit(updatedFormData);
     }
 
-    this.update(newData);
+    this.update(updatedFormData);
   }
 
   _onChangeDate() {
@@ -139,9 +142,9 @@ export default class TaskEdit extends Component {
                     <input
                       class="card__date"
                       type="text"
-                      placeholder="${moment(this._dueDate).format(`DD MMMM YYYY`)}"
+                      placeholder="${moment(this._dueDate).format(`D MMMM`)}"
                       name="date"
-                      value = "${moment(this._dueDate).format(`DD MMMM YYYY`)}"
+                      value = "${moment(this._dueDate).format(`D MMMM`)}"
 
                     />
                   </label>
@@ -149,9 +152,9 @@ export default class TaskEdit extends Component {
                     <input
                       class="card__time"
                       type="text"
-                      placeholder="${moment(this._dueDate).format(`HH:MM`)}"
+                      placeholder="${this._dueTime}"
                       name="time"
-                      value = "${moment(this._dueDate).format(`HH:MM`)}"
+                      value = "${this._dueTime}"
                     />
                   </label>
                 </fieldset>
@@ -352,7 +355,7 @@ export default class TaskEdit extends Component {
   }
 
   bind() {
-    this._element.querySelector(`.card__btn--edit`)
+    this._element.querySelector(`.card__save`)
       .addEventListener(`click`, this._onSubmitButtonClick);
     this._element.querySelector(`.card__date-deadline-toggle`)
       .addEventListener(`click`, this._onChangeDate);
@@ -366,20 +369,22 @@ export default class TaskEdit extends Component {
       flatpickr(cardDate, {
         altInput: true,
         altFormat: `j F`,
-        dateFormat: `j F`
+        dateFormat: `j F`,
+        defaultDate: this._dueDate,
       });
       flatpickr(cardTime, {
         enableTime: true,
         noCalendar: true,
         altInput: true,
         altFormat: `h:i K`,
-        dateFormat: `h:i K`
+        dateFormat: `h:i K`,
+        defaultDate: this._dueTime,
       });
     }
   }
 
   unbind() {
-    this._element.querySelector(`.card__btn--edit`)
+    this._element.querySelector(`.card__save`)
       .removeEventListener(`click`, this._onSubmitButtonClick);
     this._element.querySelector(`.card__date-deadline-toggle`)
       .removeEventListener(`click`, this._onChangeDate);
@@ -393,6 +398,7 @@ export default class TaskEdit extends Component {
     this._color = data.color;
     this._repeatingDays = data.repeatingDays;
     this._dueDate = data.dueDate;
+    this._dueTime = data.dueTime;
   }
 
   static createMapper(target) {
@@ -413,7 +419,12 @@ export default class TaskEdit extends Component {
         return target.repeatingDays[value];
       },
       date: (value) => {
-        return target.dueDate[value];
+        target.dueDate = value;
+        return target.dueDate;
+      },
+      time: (value) => {
+        target.dueTime = value;
+        return target.dueTime;
       }
     };
   }
