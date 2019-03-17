@@ -7,6 +7,7 @@ export default class Component {
     }
 
     this._element = null;
+    this._state = {};
   }
 
   get element() {
@@ -25,13 +26,16 @@ export default class Component {
     return this._element;
   }
 
-  bind() {}
-
-  unbind() {}
-
   unrender() {
     this.unbind();
     this._element.remove();
     this._element = null;
   }
+
+  update() {}
+
+  bind() {}
+
+  unbind() {}
+
 }

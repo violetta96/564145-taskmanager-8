@@ -20,9 +20,9 @@ const renderFilters = () => {
 const renderTasks = (num) => {
   const fragment = document.createDocumentFragment();
   for (let i = 0; i < num; i++) {
-    const tasks = task();
-    const taskComponent = new Task(tasks);
-    const editTaskComponent = new TaskEdit(tasks);
+    const taskData = task();
+    const taskComponent = new Task(taskData);
+    const editTaskComponent = new TaskEdit(taskData);
 
     taskComponent.onEdit = () => {
       editTaskComponent.render();
@@ -30,7 +30,15 @@ const renderTasks = (num) => {
       taskComponent.unrender();
     };
 
-    editTaskComponent.onSubmit = () => {
+    editTaskComponent.onSubmit = (updatedTaskData) => {
+      taskData.title = updatedTaskData.title;
+      taskData.tags = updatedTaskData.tags;
+      taskData.color = updatedTaskData.color;
+      taskData.repeatingDays = updatedTaskData.repeatingDays;
+      taskData.dueDate = updatedTaskData.dueDate;
+      taskData.dueTime = updatedTaskData.dueTime;
+
+      taskComponent.update(taskData);
       taskComponent.render();
       boardTasks.replaceChild(taskComponent.element, editTaskComponent.element);
       editTaskComponent.unrender();
@@ -41,6 +49,7 @@ const renderTasks = (num) => {
 
   boardTasks.appendChild(fragment);
 };
+
 
 // функция для добовления оброботчика событий на фильтр
 const onFilterClick = (evt) => {

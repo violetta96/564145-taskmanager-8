@@ -1,3 +1,4 @@
+import moment from 'moment';
 const titles = [
   `Изучить теорию`,
   `Сделать домашку`,
@@ -43,6 +44,7 @@ const getRandomTags = (items) => {
 export default () => ({
   title: getRandomItem(titles),
   dueDate: Date.now() - (DAYS_MIN * DAY) + Math.floor(Math.random() * DAYS_MAX) * DAY,
+  dueTime: moment().format(`LT`),
   tags: getRandomTags(tags),
   picture: `http://picsum.photos/100/100?r=${Math.random()}`,
   color: getRandomItem(colors),
@@ -57,3 +59,11 @@ export default () => ({
   },
   isFavorite: !!getRandomInt(0, 1),
 });
+
+export const Color = {
+  blue: `card--blue`,
+  black: `card--black`,
+  yellow: `card--yellow`,
+  green: `card--green`,
+  pink: `card--pink`,
+};

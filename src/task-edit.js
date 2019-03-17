@@ -1,10 +1,14 @@
 import Component from './component.js';
+import {Color} from './data.js';
+import moment from 'moment';
+import flatpickr from 'flatpickr';
 
 export default class TaskEdit extends Component {
   constructor(data) {
     super();
     this._title = data.title;
     this._dueDate = data.dueDate;
+    this._dueTime = data.dueTime;
     this._tags = data.tags;
     this._picture = data.picture;
     this._color = data.color;
@@ -13,6 +17,42 @@ export default class TaskEdit extends Component {
 
     this._onSubmit = null;
     this._onSubmitButtonClick = this._onSubmitButtonClick.bind(this);
+
+    this._state.isDate = false;
+    this._state.isRepeated = this._isRepeating(this._repeatingDays);
+
+    this._onChangeDate = this._onChangeDate.bind(this);
+    this._onChangeRepeated = this._onChangeRepeated.bind(this);
+  }
+
+  _processForm(formData) {
+    const entry = {
+      title: ``,
+      color: ``,
+      tags: new Set(),
+      dueDate: ``,
+      dueTime: ``,
+      repeatingDays: {
+        'mo': false,
+        'tu': false,
+        'we': false,
+        'th': false,
+        'fr': false,
+        'sa': false,
+        'su': false,
+      }
+    };
+
+    const taskEditMapper = TaskEdit.createMapper(entry);
+
+    for (const pair of formData.entries()) {
+      const [property, value] = pair;
+      if (taskEditMapper[property]) {
+        taskEditMapper[property](value);
+      }
+    }
+
+    return entry;
   }
 
   _isRepeating(days) {
@@ -24,28 +64,35 @@ export default class TaskEdit extends Component {
     return false;
   }
 
-  get _dateFormatter() {
-    const dateOptions = {
-      day: `numeric`,
-      month: `long`,
-      year: `numeric`
-    };
-
-    return new Intl.DateTimeFormat(`en-US`, dateOptions);
-  }
-
-  get _timeFormatter() {
-    const timeOptions = {
-      hour: `numeric`,
-      minute: `numeric`,
-    };
-
-    return new Intl.DateTimeFormat(`ru`, timeOptions);
-  }
-
   _onSubmitButtonClick(evt) {
     evt.preventDefault();
-    return typeof this._onSubmit === `function` && this._onSubmit();
+
+    const formData = new FormData(this._element.querySelector(`.card__form`));
+    const updatedFormData = this._processForm(formData);
+
+    if (typeof this._onSubmit === `function`) {
+      this._onSubmit(updatedFormData);
+    }
+
+    this.update(updatedFormData);
+  }
+
+  _onChangeDate() {
+    this._state.isDate = !this._state.isDate;
+    this.unbind();
+    this._partialUpdate();
+    this.bind();
+  }
+
+  _onChangeRepeated() {
+    this._state.isRepeated = !this._state.isRepeated;
+    this.unbind();
+    this._partialUpdate();
+    this.bind();
+  }
+
+  _partialUpdate() {
+    this._element.innerHTML = this.template;
   }
 
   set onSubmit(fn) {
@@ -54,7 +101,7 @@ export default class TaskEdit extends Component {
 
 
   get template() {
-    return `<article class="card card--edit card--${this._color} ${this._isRepeating(this._repeatingDays) ? `card--repeat` : ``}">
+    return `<article class="card card--edit ${Color[this._color]} ${this._isRepeating(this._repeatingDays) ? `card--repeat` : ``}">
       <form class="card__form" method="get">
         <div class="card__inner">
           <div class="card__control">
@@ -88,16 +135,16 @@ export default class TaskEdit extends Component {
             <div class="card__details">
               <div class="card__dates">
                 <button class="card__date-deadline-toggle" type="button">
-                  date: <span class="card__date-status">no</span>
+                  date: <span class="card__date-status">${this._state.isDate ? `yes` : `no`}</span>
                 </button>
-                <fieldset class="card__date-deadline" ${(this._dueDate < Date.now()) ? `disabled` : ``}>
+                <fieldset class="card__date-deadline" ${!this._state.isDate && `disabled`}>
                   <label class="card__input-deadline-wrap">
                     <input
                       class="card__date"
                       type="text"
-                      placeholder="${this._dateFormatter.format(this._dueDate)}"
+                      placeholder="${moment(this._dueDate).format(`D MMMM`)}"
                       name="date"
-                      value = "${this._dateFormatter.format(this._dueDate)}"
+                      value = "${moment(this._dueDate).format(`D MMMM`)}"
 
                     />
                   </label>
@@ -105,16 +152,16 @@ export default class TaskEdit extends Component {
                     <input
                       class="card__time"
                       type="text"
-                      placeholder="${this._timeFormatter.format(this._dueDate)}"
+                      placeholder="${this._dueTime}"
                       name="time"
-                      value = "${this._timeFormatter.format(this._dueDate)}"
+                      value = "${this._dueTime}"
                     />
                   </label>
                 </fieldset>
                 <button class="card__repeat-toggle" type="button">
-                  repeat:<span class="card__repeat-status">no</span>
+                  repeat:<span class="card__repeat-status">${this._state.isRepeated ? `yes` : `no`}</span>
                 </button>
-                <fieldset class="card__repeat-days ${this._isRepeating(this._repeatingDays) ? `` : ` disabled`}">
+                <fieldset class="card__repeat-days ${!this._state.isRepeated && `disabled`}">
                   <div class="card__repeat-days-inner">
                     <input
                       class="visually-hidden card__repeat-day-input"
@@ -236,6 +283,7 @@ export default class TaskEdit extends Component {
                   class="card__color-input card__color-input--black visually-hidden"
                   name="color"
                   value="black"
+                  ${this._color === `black` && `checked`}
                 />
                 <label
                   for="color-black-2"
@@ -248,6 +296,7 @@ export default class TaskEdit extends Component {
                   class="card__color-input card__color-input--yellow visually-hidden"
                   name="color"
                   value="yellow"
+                  ${this._color === `yellow` && `checked`}
                 />
                 <label
                   for="color-yellow-2"
@@ -260,6 +309,7 @@ export default class TaskEdit extends Component {
                   class="card__color-input card__color-input--blue visually-hidden"
                   name="color"
                   value="blue"
+                  ${this._color === `blue` && `checked`}
                 />
                 <label
                   for="color-blue-2"
@@ -272,6 +322,7 @@ export default class TaskEdit extends Component {
                   class="card__color-input card__color-input--green visually-hidden"
                   name="color"
                   value="green"
+                  ${this._color === `green` && `checked`}
                 />
                 <label
                   for="color-green-2"
@@ -284,7 +335,7 @@ export default class TaskEdit extends Component {
                   class="card__color-input card__color-input--pink visually-hidden"
                   name="color"
                   value="pink"
-                  checked
+                  ${this._color === `pink` && `checked`}
                 />
                 <label
                   for="color-pink-2"
@@ -304,13 +355,78 @@ export default class TaskEdit extends Component {
   }
 
   bind() {
-    this._element.querySelector(`.card__btn--edit`)
-          .addEventListener(`click`, this._onSubmitButtonClick);
+    this._element.querySelector(`.card__save`)
+      .addEventListener(`click`, this._onSubmitButtonClick);
+    this._element.querySelector(`.card__date-deadline-toggle`)
+      .addEventListener(`click`, this._onChangeDate);
+    this._element.querySelector(`.card__repeat-toggle`)
+      .addEventListener(`click`, this._onChangeRepeated);
+
+    if (this._state.isDate) {
+      const cardDate = this._element.querySelector(`.card__date`);
+      const cardTime = this._element.querySelector(`.card__time`);
+
+      flatpickr(cardDate, {
+        altInput: true,
+        altFormat: `j F`,
+        dateFormat: `j F`,
+        defaultDate: this._dueDate,
+      });
+      flatpickr(cardTime, {
+        enableTime: true,
+        noCalendar: true,
+        altInput: true,
+        altFormat: `h:i K`,
+        dateFormat: `h:i K`,
+        defaultDate: this._dueTime,
+      });
+    }
   }
 
   unbind() {
-    this._element.querySelector(`.card__btn--edit`)
-          .removeEventListener(`click`, this._onSubmitButtonClick);
+    this._element.querySelector(`.card__save`)
+      .removeEventListener(`click`, this._onSubmitButtonClick);
+    this._element.querySelector(`.card__date-deadline-toggle`)
+      .removeEventListener(`click`, this._onChangeDate);
+    this._element.querySelector(`.card__repeat-toggle`)
+      .removeEventListener(`click`, this._onChangeRepeated);
+  }
+
+  update(data) {
+    this._title = data.title;
+    this._tags = data.tags;
+    this._color = data.color;
+    this._repeatingDays = data.repeatingDays;
+    this._dueDate = data.dueDate;
+    this._dueTime = data.dueTime;
+  }
+
+  static createMapper(target) {
+    return {
+      hashtag: (value) => {
+        return target.tags.add(value);
+      },
+      text: (value) => {
+        target.title = value;
+        return target.title;
+      },
+      color: (value) => {
+        target.color = value;
+        return target.color;
+      },
+      repeat: (value) => {
+        target.repeatingDays[value] = true;
+        return target.repeatingDays[value];
+      },
+      date: (value) => {
+        target.dueDate = value;
+        return target.dueDate;
+      },
+      time: (value) => {
+        target.dueTime = value;
+        return target.dueTime;
+      }
+    };
   }
 
 }
