@@ -41,7 +41,7 @@ const getRandomTags = (items) => {
   return newArray;
 };
 
-export default () => ({
+export const task = () => ({
   title: getRandomItem(titles),
   dueDate: Date.now() - (DAYS_MIN * DAY) + Math.floor(Math.random() * DAYS_MAX) * DAY,
   dueTime: moment().format(`LT`),

@@ -1,4 +1,4 @@
-import task from './data.js';
+import {task} from './data.js';
 import {filtersNames, generateFilter} from './make-filter.js';
 import Task from './task.js';
 import TaskEdit from './task-edit.js';
@@ -6,6 +6,16 @@ import TaskEdit from './task-edit.js';
 const CARDS_AMOUNT = 7;
 const boardTasks = document.querySelector(`.board__tasks`);
 const mainFilter = document.querySelector(`.main__filter`);
+
+const createTasks = (count) => {
+  const tasks = [];
+  for (let i = 0; i < count; i++) {
+    tasks.push(task());
+  }
+  return tasks;
+};
+
+const data = createTasks(CARDS_AMOUNT);
 
 // функция для отрисовки фильтров
 const renderFilters = () => {
@@ -16,11 +26,37 @@ const renderFilters = () => {
   mainFilter.innerHTML = fragment;
 };
 
+const filterTasks = (tasks, filterName) => {
+  switch (filterName) {
+    case `filter__all`:
+      return tasks;
+
+    case `filter__overdue`:
+      return tasks.filter((it) => it.dueDate < Date.now());
+
+    case `filter__repeating`:
+      return tasks.filter((it) => [...Object.entries(it.repeatingDays)]
+          .some((rec) => rec[1]));
+  }
+};
+
+const updateTask = (tasks, newTask) => {
+  tasks = Object.assign({}, tasks, newTask);
+  return tasks;
+};
+
+const deleteTask = (tasks, i) => {
+  tasks.splice(i, 1);
+  return tasks;
+};
+
 // функция для отрисовки карточек
-const renderTasks = (num) => {
+const renderTasks = (cardData) => {
+  boardTasks.innerHTML = ``;
+
   const fragment = document.createDocumentFragment();
-  for (let i = 0; i < num; i++) {
-    const taskData = task();
+  for (let i = 0; i < cardData.length; i++) {
+    const taskData = cardData;
     const taskComponent = new Task(taskData);
     const editTaskComponent = new TaskEdit(taskData);
 
@@ -31,16 +67,15 @@ const renderTasks = (num) => {
     };
 
     editTaskComponent.onSubmit = (updatedTaskData) => {
-      taskData.title = updatedTaskData.title;
-      taskData.tags = updatedTaskData.tags;
-      taskData.color = updatedTaskData.color;
-      taskData.repeatingDays = updatedTaskData.repeatingDays;
-      taskData.dueDate = updatedTaskData.dueDate;
-      taskData.dueTime = updatedTaskData.dueTime;
-
-      taskComponent.update(taskData);
+      const updatedTask = updateTask(taskData, updatedTaskData);
+      taskComponent.update(updatedTask);
       taskComponent.render();
       boardTasks.replaceChild(taskComponent.element, editTaskComponent.element);
+      editTaskComponent.unrender();
+    };
+
+    editTaskComponent.onDelete = () => {
+      deleteTask(taskData, i);
       editTaskComponent.unrender();
     };
 
@@ -53,16 +88,13 @@ const renderTasks = (num) => {
 
 // функция для добовления оброботчика событий на фильтр
 const onFilterClick = (evt) => {
-  const filterLabel = evt.target.closest(`.filter__label`);
-  if (filterLabel) {
-    boardTasks.innerHTML = ``;
-    const cardsNumber = filterLabel.querySelector(`.filter__all-count`).textContent;
-    renderTasks(cardsNumber);
-  }
+  const filterName = evt.target.id;
+  const filteredTasks = filterTasks(data, filterName);
+  renderTasks(filteredTasks);
 };
 
 
 renderFilters();
-renderTasks(CARDS_AMOUNT);
+renderTasks(data);
 
 document.body.addEventListener(`click`, onFilterClick);
