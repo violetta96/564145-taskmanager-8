@@ -34,6 +34,9 @@ const filterTasks = (tasks, filterName) => {
     case `filter__overdue`:
       return tasks.filter((it) => it.dueDate < Date.now());
 
+    case `filter__today`:
+      return tasks.filter((it) => true);
+
     case `filter__repeating`:
       return tasks.filter((it) => [...Object.entries(it.repeatingDays)]
           .some((rec) => rec[1]));
@@ -51,12 +54,12 @@ const deleteTask = (tasks, i) => {
 };
 
 // функция для отрисовки карточек
-const renderTasks = (cardData) => {
-  boardTasks.innerHTML = ``;
+const renderTasks = (cardsData) => {
+  // boardTasks.innerHTML = ``;
 
   const fragment = document.createDocumentFragment();
-  for (let i = 0; i < cardData.length; i++) {
-    const taskData = cardData;
+  for (let i = 0; i < cardsData.length; i++) {
+    const taskData = cardsData[i];
     const taskComponent = new Task(taskData);
     const editTaskComponent = new TaskEdit(taskData);
 
@@ -76,6 +79,7 @@ const renderTasks = (cardData) => {
 
     editTaskComponent.onDelete = () => {
       deleteTask(taskData, i);
+      boardTasks.removeChild(editTaskComponent.element);
       editTaskComponent.unrender();
     };
 
