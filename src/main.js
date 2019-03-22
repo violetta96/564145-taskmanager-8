@@ -1,4 +1,4 @@
-import {task} from './data.js';
+import {tasksData} from './data.js';
 import {filtersNames, generateFilter} from './make-filter.js';
 import Task from './task.js';
 import TaskEdit from './task-edit.js';
@@ -7,15 +7,7 @@ const CARDS_AMOUNT = 7;
 const boardTasks = document.querySelector(`.board__tasks`);
 const mainFilter = document.querySelector(`.main__filter`);
 
-const createTasks = (count) => {
-  const tasks = [];
-  for (let i = 0; i < count; i++) {
-    tasks.push(task());
-  }
-  return tasks;
-};
-
-const data = createTasks(CARDS_AMOUNT);
+const data = tasksData(CARDS_AMOUNT);
 
 // функция для отрисовки фильтров
 const renderFilters = () => {
@@ -34,12 +26,11 @@ const filterTasks = (tasks, filterName) => {
     case `filter__overdue`:
       return tasks.filter((it) => it.dueDate < Date.now());
 
-    case `filter__today`:
-      return tasks.filter((it) => true);
-
     case `filter__repeating`:
       return tasks.filter((it) => [...Object.entries(it.repeatingDays)]
           .some((rec) => rec[1]));
+    default:
+      return tasks;
   }
 };
 
@@ -48,20 +39,16 @@ const updateTask = (tasks, newTask) => {
   return tasks;
 };
 
-const deleteTask = (tasks, i) => {
-  tasks.splice(i, 1);
-  return tasks;
-};
-
 // функция для отрисовки карточек
 const renderTasks = (cardsData) => {
-  // boardTasks.innerHTML = ``;
-
-  const fragment = document.createDocumentFragment();
+  boardTasks.innerHTML = ``;
   for (let i = 0; i < cardsData.length; i++) {
     const taskData = cardsData[i];
     const taskComponent = new Task(taskData);
     const editTaskComponent = new TaskEdit(taskData);
+
+    taskComponent.render();
+    boardTasks.appendChild(taskComponent.element);
 
     taskComponent.onEdit = () => {
       editTaskComponent.render();
@@ -78,20 +65,15 @@ const renderTasks = (cardsData) => {
     };
 
     editTaskComponent.onDelete = () => {
-      deleteTask(taskData, i);
-      boardTasks.removeChild(editTaskComponent.element);
       editTaskComponent.unrender();
     };
-
-    fragment.appendChild(taskComponent.render());
   }
-
-  boardTasks.appendChild(fragment);
 };
 
 
 // функция для добовления оброботчика событий на фильтр
 const onFilterClick = (evt) => {
+  boardTasks.innerHTML = ``;
   const filterName = evt.target.id;
   const filteredTasks = filterTasks(data, filterName);
   renderTasks(filteredTasks);

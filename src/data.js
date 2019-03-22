@@ -60,6 +60,8 @@ export const task = () => ({
   isFavorite: !!getRandomInt(0, 1),
 });
 
+export const tasksData = (limit) => [...Array(limit).keys()].map(task);
+
 export const Color = {
   blue: `card--blue`,
   black: `card--black`,
